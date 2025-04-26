@@ -1,38 +1,84 @@
 package com.auth.quizze.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-
+import org.springframework.web.bind.annotation.*;
+import com.auth.quizze.services.QuizzeService;
+import java.util.List;
 
 @RestController
 @RequestMapping("/quizze")
 public class QuizzeController {
-	
-	//Post Seleziona l'esercizio 
-//    @PostMapping (value = "/seleziona-esercizio", consumes = "application/json", produces = "application/json")
-//    @Operation(summary = "Seleziona l'esercizio", description = "Seleziona l'esercizio.")
-//	public ResponseEntity<Domande> selezionaEsercizio(@RequestBody Domande domande) {
-//		// Logica per selezionare l'esercizio
-//		// Restituisci una risposta appropriata
-//		return new ResponseEntity<>(domande, HttpStatus.OK);
-//	}
-	
-	/*@PostMapping(value = "/create", consumes = "application/json", produces = "application/json")
-	    @Operation(summary = "Crea un nuovo prodotto", description = "Crea un nuovo prodotto.")
-		public ResponseEntity<Prodotti> createProdotto(@RequestBody Prodotti prodotto) {
-			Prodotti nuovoProdotto = prodottiServices.saveProdotti(prodotto);
-	        return new ResponseEntity<>(nuovoProdotto, HttpStatus.CREATED);
-	    }*/
-	
-	
-	
-	//Get Output Domanda Esegue la domanda con le risposte multiple
-	//Post Inpt Risposta utente
-	//Get Output Statistiche risposte totali , corrette e Sbagliate
-	
+
+    @Autowired
+    private QuizzeService quizzeService;
+
+    // Insert endpoints
+    @PostMapping("/esercizio")
+    public ResponseEntity<Void> insertEsercizio(@RequestParam String nome, @RequestParam String descrizione) {
+        quizzeService.insertEsercizio(nome, descrizione);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/domanda")
+    public ResponseEntity<Void> insertDomanda(@RequestParam String testo, @RequestParam Long esercizioId) {
+        quizzeService.insertDomanda(testo, esercizioId);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/opzione")
+    public ResponseEntity<Void> insertOpzioneMultipla(
+            @RequestParam String testo, 
+            @RequestParam boolean corretta, 
+            @RequestParam Long domandaId) {
+        quizzeService.insertOpzioneMultipla(testo, corretta, domandaId);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/risposta")
+    public ResponseEntity<Void> insertRisposta(
+            @RequestParam String testo, 
+            @RequestParam boolean corretta, 
+            @RequestParam Long domandaId) {
+        quizzeService.insertRisposta(testo, corretta, domandaId);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    // Query endpoints
+    @GetMapping("/all")
+    public ResponseEntity<List<Object[]>> getAllEserciziWithDomandeAndOpzioni() {
+        return ResponseEntity.ok(quizzeService.findAllEserciziWithDomandeAndOpzioni());
+    }
+
+    @GetMapping("/esercizio/{esercizioId}")
+    public ResponseEntity<List<Object[]>> getEsercizioWithDomandeAndOpzioni(@PathVariable Long esercizioId) {
+        return ResponseEntity.ok(quizzeService.findEsercizioWithDomandeAndOpzioni(esercizioId));
+    }
+
+    @GetMapping("/domanda/{domandaId}")
+    public ResponseEntity<List<Object[]>> getDomandaWithOpzioni(@PathVariable Long domandaId) {
+        return ResponseEntity.ok(quizzeService.findDomandaWithOpzioni(domandaId));
+    }
+
+    @GetMapping("/dettagli")
+    public ResponseEntity<List<Object[]>> getEserciziDomandeOpzioni() {
+        return ResponseEntity.ok(quizzeService.getEserciziDomandeOpzioni());
+    }
+
+    @GetMapping("/dettagli/{esercizioId}")
+    public ResponseEntity<List<Object[]>> getEsercizioDomandeOpzioniById(@PathVariable Long esercizioId) {
+        return ResponseEntity.ok(quizzeService.getEsercizioDomandeOpzioniById(esercizioId));
+    }
+
+    // Verification endpoints
+    @GetMapping("/verifica/{opzioneId}")
+    public ResponseEntity<Boolean> isRispostaCorretta(@PathVariable Long opzioneId) {
+        return ResponseEntity.ok(quizzeService.isRispostaCorretta(opzioneId));
+    }
+
+    @GetMapping("/verifica/dettagli/{opzioneId}")
+    public ResponseEntity<List<Object[]>> verificaRispostaConDettagli(@PathVariable Long opzioneId) {
+        return ResponseEntity.ok(quizzeService.verificaRispostaConDettagli(opzioneId));
+    }
 }

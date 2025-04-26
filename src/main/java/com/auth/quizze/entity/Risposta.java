@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+
 
 @Entity
 @Table(name = "Tab_Risposte")
@@ -21,11 +19,7 @@ public class Risposta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idRisposte")
-    
-    
-    
-    
+    @Column(name = "idRisposte")      
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
